@@ -71,5 +71,43 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule);
 ```
 
 ####  어플리케이션 실행
+일단 설치가 마무리 된 뒤, OS의 프롬프트에서 다음 명령어를 실행시킴으로 HTTP 요청을 받기 위해 리스닝하는 어플리케이션을 실행 시킬 수 있습니다.
 
----
+```shell
+$ npm run start
+```
+
+> HINT 
+> 개발 프로세스 속도 향상을 시키기 위해 다음 플래그를 통해`SWC builder` 를 사용할 수 있다. `npm run start -- -b swc`
+
+```plain
+Speedy Web Compiler 는 Rust-based 플랫폼으로 컴파일과 빌드 속도를 월등하게 만들어줍니다. 실제로 적용해본 결과 실행 속도 면에서 차이는 없으나, 컴파일 속도는 월등하게 빨랐습니다. 이 부분은 엄청 도움이 되거나, 프로덕션 환경에서 성능적 이점이 있는 것은 아니지만, 적용 해놓는 것만으로도 개발 시 편리함 + 배포 시 빠른 배포가 가능하다는 점 등에선 매우 유용해 보입니다. 
+```
+
+위의 명령어를 통해 `src/main.ts` 파일에 기제된 포트 번호로 HTTP 서버 리스닝이 수행되며 앱이 실행 됩니다. 일단 어플리케이션이 실행 되면, 브라우저에서 `http://localhost:3000/` 으로 접속이 가능하고 `Hello World!` 메시지를 볼 수 있습니다. 
+
+파일의 변화를 감시하면서, 어플리케이션을 지속적으로 재 실행하는 방법은 
+
+```shell
+$ npm run start:dev
+```
+
+이 명령어는 파일들을 감시하고, 자동적으로 서버의 재 컴파일 및 리로드를 제공할 것입니다. 
+
+#### Linting and formatting
+Nest CLI 는 대규모로 안정적인 개발 워크플로를 구축하기 위해 최선의 노력을 다하고 있습니다. 그래서 생성된 Nest 프로젝트는 linter, formatter 둘다 사전 설치를 진행해줍니다. 각각 `eslint`, `prettier`입니다.
+
+> Lint vs prettier
+> 프리티어는 포맷팅 룰을 개선해주는 역할로 프로그래머의 실수를 가능한 줄여주는 역할을 하며, 코드의 수준을 보안해주는 역할이 Linter이 해줍니다.
+
+최대한의 안정성과 확장성을 보장하기 위해, Nest는 두 패키지를 제공해주며, 이 설정을 사용하면 설계 상 공식 확장과 깔끔한 IDE 통합 환경을 구축하는데 도움을 줍니다. 
+
+IDE가 관련되지 않은 헤드리스 환경의 경우 Nest 프로젝트에는 즉시 사용 가능한 npm 스크립트도 내장하고 있습니다. 
+
+```shell
+# Lint and autofix with eslint
+$ npm run lint 
+
+# Format with prettier 
+$ npm run format
+```
