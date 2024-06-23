@@ -174,12 +174,63 @@ getDocs(@Query('version') version) {
 ```
 
 #### Route parameters 
+정적인 경로를 가진 라우트는 동적 데이터를 request의 부분으로 삼고 있는 것을 수용하길 원할 때, 정상적으로 동작하지 않을 것입니다.(e.g., `GET /cats/1`, id 1인 cat) 인자와 함께 루트를 정의 내리기 위해선, request URL 안의 위치에 동적인 값을 취하기 위해 루트의 경로 상에 패러미터 토큰들을 넣어 둘 수 있다. `@Get()` 안에 있는 인자 토큰 루트 예시는 이러한 사용 방식을 아래 예시를 통해 보여줍니다. 이 방식으로 선언된 루트 인자의 경우 `@Param()` 데코레이터를 통해 접근이 가능하며, 메서드 식별자로 추가 될 수 있다. 
+
+> HINT
+> 인자를 가진 루트는 정적 경로 후에 선언되어야 한다. 이렇게 하면 매개변수화된 경로가 정적 경로로 향하는 트래픽을 가로 채는 것을 방지할 수 있다. 
+
+```ts
+@Get(':id')
+findOne(@Param() params: any): string {
+  console.log(params.id);
+  return `This action returns a #${params.id} cat`;
+}
+```
+
+`@Param()`은 메서드 인자로 사용되는 데코레이터 이고, 메서드의 바디 안에 메서드 인자로 데코레이트된 프로퍼티들로써 루트 패러미터를 이용 가능하게 만들어준다. 위의 코드에서 볼 수 있듯, 우리는 `id` 패러미터를 `params.id` 라는 식으로 참조하여 접근이 가능합니다. 이렇게 데코레이터를 통해 특정 인자 토큰을 전달하는게 가능하며, 그 뒤에 루트 인자로 직접 메서드 바디 안의 이름을 통해 참조가 가능하다. 
+
+```ts
+@Get(':id')
+findOne(@Param('id') id: string): string {
+  return `This action returns a #${id} cat`;
+}
+```
 
 #### Sub-Domain Routing
+`@Controller` 데코레이터는 `host` 라는 옵션을 취할 수 있고, 이는 들어오는 요청에서 매칭 시켜야하는 특정한 값으로 HTTP host를 요구하게 만듭니다. 
+
+```ts
+@Controller({ host: 'admin.example.com' })
+export class AdminController {
+  @Get()
+  index(): string {
+    return 'Admin page';
+  }
+}
+```
+
+> WARNING
+> Fastify의 nested router들을 위한 부족한 지원으로 인해, 서브 도메인 라우팅을 써야 한다면, default 값인 Express adapter를 반드시 대신 사용해야 합니다. 
+
+`path`를 라우팅 해주는 것고 유사하게, `host` 옵션은 호스트 명 안에 위치에 대한 동적 값을 취하기 위해 토큰들을 사용할 수 있다. `@Controller` 데코레이터 안에 호스트 인자 토큰은 아래에서 어떻게 사용되는지를 보여줍니다. 이러한 방식으로 선언된 호스트 인자는 `@HostParam()` 이라는 데코레이터를 사용함으로써 접근이 가능하며, 이는 메서드 시그니쳐로 반드시 추가 되어야 합니다.
+
+```ts
+@Controller({ host: ':account.example.com' })
+export class AccountController {
+  @Get()
+  getInfo(@HostParam('account') account: string) {
+    return account;
+  }
+}
+```
 
 #### Scopes
+다른 프로그램 언어 백그라운드를 가진 사람들에게, Nest에서 들어오는 request 전반에 걸쳐 모든 것이 공유 된다는 사실은 예상치 못한 부분일 수 있습니다. 데이터베이스에 대한 연결 풀, 전역 상태를 포함하는 싱글톤 등등... Node.js에서는 모든 요청이 별도의 스레드에 의해 처리되는 기존의 request/ response Multi-Thrread Stateless Model을 따르지 않는다는 사실을 기억해야 합니다. 따라서 싱글톤 인스턴스를 사용하는 것은 Nest에서는 완전히 안전함을 보장해줍니다. 
+
+그러나, Controller의 요청 기반의 lifetime이 원하는 동작일 수 있는 극단적인 경우가 있습니다.(eg. GraphQL 어플리케이션의 request 별 캐싱, request 추적, 또는 Muli-tenancy이 포함됩니다.) 따라서 [여기](https://docs.nestjs.com/fundamentals/injection-scopes)에서 제어 범위를 어떻게 제어하는지를 배울 수 있습니다.  
 
 #### Asyncronicity
+
 
 #### Request payloads
 
