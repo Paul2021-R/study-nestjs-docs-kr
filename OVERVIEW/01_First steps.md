@@ -40,7 +40,7 @@ src
 
 `main.ts` 는 우리의 어플리케이션을 **bootstrap** 해줄 비동기 기능이 포함되어 있습니다. 
 
-```ts
+```typescript
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -65,7 +65,7 @@ Nest는 플랫폼에 구애받지 않는 프레임워크를 지향합니다. 플
 
 `NestFactory.create()` 메소드를 타입하여 당신이 지나치는 순간, 아래의 예시처럼 `app` 객체는 특정 플랫폼을 위한 베타적인 메서드를 가지게 된다. 그러나 실제로 기본 플랫폼 API에 액세스하려는 경우가 아니면 유형을 지정할 필요 가 없습니다 .
 
-```ts
+```typescript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 ```
