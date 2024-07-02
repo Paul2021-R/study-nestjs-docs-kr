@@ -321,6 +321,51 @@ export class CatsController {
 ```
 
 #### Getting up and running 
+위의 컨트롤러가 완전히 정의된 경우 Nest는 여전히 `CatsController`가 존재하는지 알지 못하므로 결과적으로 이 클래스의 인스턴스를 생성하지 않습니다.
+
+컨트롤러는 항상 모듈에 속하므로 `@Module()` 데코레이터 내에 `컨트롤러` 배열을 포함합니다. 아직 루트 AppModule을 제외한 다른 모듈을 정의하지 않았으므로 이를 사용하여 `CatsController`를 소개하겠습니다.
+
+```typescript
+import { Module } from '@nestjs/common';
+import { CatsController } from './cats/cats.controller';
+
+@Module({
+  controllers: [CatsController],
+})
+export class AppModule {}
+```
 
 #### Libaray-specific approach 
+지금까지 응답을 조작하는 Nest 표준 방식에 대해 논의했습니다. 응답을 조작하는 두 번째 방법은 `라이브러리별 응답 개체`를 사용하는 것입니다. 특정 응답 객체를 주입하려면 `@Res()` 데코레이터를 사용해야 합니다. 차이점을 보여주기 위해 `CatsController`를 다음과 같이 다시 작성해 보겠습니다.
 
+```typescript 
+import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
+
+@Controller('cats')
+export class CatsController {
+  @Post()
+  create(@Res() res: Response) {
+    res.status(HttpStatus.CREATED).send();
+  }
+
+  @Get()
+  findAll(@Res() res: Response) {
+     res.status(HttpStatus.OK).json([]);
+  }
+}
+```
+
+이 접근 방식은 효과가 있고 실제로 응답 개체에 대한 전체 제어(헤더 조작, 라이브러리 관련 기능 등)를 제공하여 어떤 면에서 더 많은 유연성을 허용하지만 주의해서 사용해야 합니다. 일반적으로 이 접근 방식은 덜 명확하며 몇 가지 단점이 있습니다. 가장 큰 단점은 코드가 플랫폼에 종속되고**(기본 라이브러리가 응답 개체에 대해 다른 API를 가질 수 있으므로) 테스트하기가 더 어렵다는 것입니다(응답 개체를 모의해야 하는 등).**
+
+또한 위의 예에서는 `인터셉터` 및 `@HttpCode()` / `@Header()` 데코레이터와 같은 Nest 표준 응답 처리에 의존하는 Nest 기능과의 호환성이 손실됩니다. 이 문제를 해결하려면 다음과 같이 `passthrough` 옵션을 `true`로 설정하면 됩니다.
+
+```typescript
+@Get()
+findAll(@Res({ passthrough: true }) res: Response) {
+  res.status(HttpStatus.OK);
+  return [];
+}
+```
+
+이제 기본 응답 개체와 상호 작용할 수 있지만(예: 특정 조건에 따라 쿠키 또는 헤더 설정) 나머지는 프레임워크에 맡기게 됩니다. 
