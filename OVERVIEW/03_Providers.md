@@ -72,6 +72,14 @@ export class CatsController {
 
 ### Dependency Injection
 
+Nest는 Dependency Injection이라고 불리는 대중적이며 아주 강력한 디자인 패턴을 기반으로 만들어졌습니다. 우리는 공식 Angular 문서가 해당 개념에 관한 좋은 기사이므로, 읽어보길 권장 드립니다. 
+
+Nest 상에서는, TS의 호환성 덕분에, 의존성을 관리하는 것이 매우 쉽게 구현되어 있습니다. 왜냐하면 type에 의해 해결이 용이하기 때문입니다. 하단 예시에서, Nest 는 `catService` 를 `CatsServuce`의 인스턴스를 생성 및 반환함으로써 의존성 문제를 해결한다. (혹은, 싱글톤 패턴의 일반적인 상황 하에서는, 요청된 어딘가에서 이미 존재하는 인스턴스를 반환한다.) 이 의존성이란 것은 당신의 컨트롫러의 생성자로 해결되며, 전달된다(혹은 지어된 프로퍼티로 할당된다.)
+
+```typescript 
+constructor(private catsService: CatsService) {}
+```
+
 ### Scopes
 
 ### Custom providers
