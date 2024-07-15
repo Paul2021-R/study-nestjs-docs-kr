@@ -82,12 +82,44 @@ constructor(private catsService: CatsService) {}
 
 ### Scopes
 
+프로바이더는 일반적으로 application의 라이프사이클과 동기화된 라이프 타임(scope)를 갖고 있습니다. application이 부트스트랩될 때, 모든 의존성은 반드시 resolve 되어야 하며, 그러므로 프로바이더들은 인스턴스화 되어야 합니다. 이와 함께, application이 종료 될 때, 각 프로바이더 역시 destroy 되어야 합니다. 그러나 공급자 수명 요청 범위를 지정하는 방법도 있고, 이 기술에 대해선 [여기](https://docs.nestjs.com/fundamentals/injection-scopes)를 참고하십시오.
+
 ### Custom providers
+Nest는 IoC(제어의 역전) 컨테이너를 빌트인하고 있고, 이는 프로바이더들 사이의 관계성을 resolve 해줍니다. 이 기능은 위에서 언급한 의존성 주입의 기능의 기반이 된다. 하지만 실제론 우리가 언급하는 것 이상으로 더 강력합니다. 프로바이더를 정의내리는 방법은 몇가지 방법이 존재합니다. :
+순수한 값, 클래스, 그리고 비동기 혹은 동기의 factory를 활용할 수 있으며 더 많은 예시는 [여기](https://docs.nestjs.com/fundamentals/custom-providers)를 참고 하세요.
 
 ### Optional providers
+때때로, resolve 할 필요가 없는 의존성들도 존재합니다. 예를 들어, 당신이 제작한 클래스는 `configuration object`에 의존합니다. 그러나 none 이 전달된다면, 기본값이 전달될 것입니다. 이러한 경우에 따라, 의존성은 선택적이 될 수 있고, configuration 프로바이더의 부족은 에러를 야기하지 않을 수 있습니다. 
+
+프로바이더를 옵셔널로 가리키기 위해, `@Optional()` 데코레이터를 생성자의 시그니쳐에 달아 줌으로써 사용도 가능하다. 
+
+```typescript 
+
+import { Injectable, Optional, Inject } from '@nestjs/common';
+
+@Injectable()
+export class HttpService<T> {
+  constructor(@Optional() @Inject('HTTP_OPTIONS') private httpClient: T) {}
+}
+```
+위의 예시를 보면, 우리는 커스텀 프롭이더를 사용하고 있습니다. 이는 우리가 `HTTP_OPTIONS`라는 커스텀 **token**을 포함하고 있기 때문입니다. 이전 예시가 생성자 기반으로 생성자 안에서 클래스를 통해 의존성을 가리키는 주입을 보여주었습니다.커스텀 프로바이더에 대해 더 읽고 싶거나, token들에 대해 보고 싶다면 [여기](https://docs.nestjs.com/fundamentals/custom-providers)를 읽어 보세요.
 
 ### Property-based injection
+지금까지 사용했던 방식의 기술은 생성자 기반의 주입이라고 불리며, 프로바이더들은 생성자 메서드를 경유해서 주입되는 프로바이더들입니다. 특수한 케이스로, Property-based injection 가 유용한 경우도 존재합니다. 예를 들어, 만약 top-level 클래스가 다수의 프로바이더 혹은 하나의 프로바이더에 의존하고 있다면, 생성자의 하위 클래스에서 `super()`를 호출하는 방법으로 공급자를 끝까지 전달하는 것은 매우 지루할 수 있습니다. 이를 피하기 위해, `@Inject()` 데코레이터를 프로퍼티 래벨에서 사용할 수 있습니다. 
+
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+
+@Injectable()
+export class HttpService<T> {
+  @Inject('HTTP_OPTIONS')
+  private readonly httpClient: T;
+}
+```
+> WARNING 
+> 만약 당신의 클래스가 다른 클래스로 확장하지 않는다면, 당신은 아마도 constructor-based 주입을 사용하는 것을 선호할 것이다. 생성자는 요청되는 의존성이 무엇인지, 그리고 `@Inject`와 함께 어노테이션되는 클래스 속성보다 더 좋은 가독성을 제공해준다. 
 
 ### Provider registration
+이제 프로바이더를 정의 내릴수 있습니다(`CatsService`). 그리고 이제 서비스의 소비자를 가질수 있으며, Nest와 함께 서비스를 등록할 필요가 있고, 그 결과 주입을 수행할 수 있습니다. 
 
 ### Manual instantiation
