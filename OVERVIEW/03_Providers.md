@@ -116,10 +116,31 @@ export class HttpService<T> {
   private readonly httpClient: T;
 }
 ```
+
 > WARNING 
 > 만약 당신의 클래스가 다른 클래스로 확장하지 않는다면, 당신은 아마도 constructor-based 주입을 사용하는 것을 선호할 것이다. 생성자는 요청되는 의존성이 무엇인지, 그리고 `@Inject`와 함께 어노테이션되는 클래스 속성보다 더 좋은 가독성을 제공해준다. 
 
 ### Provider registration
-이제 프로바이더를 정의 내릴수 있습니다(`CatsService`). 그리고 이제 서비스의 소비자를 가질수 있으며, Nest와 함께 서비스를 등록할 필요가 있고, 그 결과 주입을 수행할 수 있습니다. 
+이제 프로바이더를 정의 내릴수 있습니다(`CatsService`). 그리고 이제 서비스의 소비자를 가질수 있으며, Nest와 함께 서비스를 등록할 필요가 있고, 그 결과 주입을 수행할 수 있습니다. 이러한 행동들은 우리의 모듈 파일을 편집하여서 가능해지고, 서비스를 프로바이더들의 배열로, 모듈의 데코레이터(`@Module()`)가 됩니다. 
+
+Nest 는 `CatsController` 클래스의 의존성을 해결할수 있을 것입니다.
+
+아래는 어떻게 디렉터리가 보여야 하는지를 나타냅니다.
+
+```
+src
+  cats
+    dto
+      create-cat.dto.ts
+    interfaces
+           cat.interface.ts
+    cats.controller.ts
+    cats.service.ts
+  app.module.ts
+  main.ts
+```
 
 ### Manual instantiation
+의존성 주입이 지금까지는 자동으로 처리 되긴 했으나, 특정 상황에선 내장된 의존성 주입 시스템의 밖에서 진행해야 할 필요가 있을 수 있다. 이에 대한 토픽을 하단에 간단하게 소개해봅니다.
+기존의 인스턴스들을 얻기 위해 혹은 동적으로 프로바이더들을 인스턴스화 하기 위해선, [모듈](https://docs.nestjs.com/fundamentals/module-ref) 문서를 참고하세요.
+`bootstrap()` 함수 내에서 프로바이더를 얻어야 한다면, [스탠드얼론 어플리케이션](https://docs.nestjs.com/standalone-applications) 이라는 문서를 참고하세요.
